@@ -2,6 +2,8 @@ package PlanetWars;
 use warnings;
 use strict;
 use POSIX;
+use Scalar::Util qw(blessed);
+use List::Util qw(first);
 use Planet;
 use Fleet;
 
@@ -23,12 +25,9 @@ sub NumPlanets {
 
 sub GetPlanet {
     my ($self, $planet_id) = @_;
-    foreach (@{$self->{_planets}}) {
-        if ($_->PlanetID() == $planet_id) {
-            return $_;
-        }
-    }
-    die('planet doesnt exist');
+    my $planet = first { $_->PlanetID == $planet_id } $self->Planets;
+    croak("planet $planet_id doesnt exist") unless $planet;
+    return $planet;
 }
 
 sub NumFleets {
@@ -38,12 +37,9 @@ sub NumFleets {
 
 sub GetFleet {
     my ($self, $fleet_id) = @_;
-    foreach (@{$self->{_fleets}}) {
-        if ($_->FleetID() == $fleet_id) {
-            return $_;
-        }
-    }
-    die('fleet doesnt exist');
+    my $fleet = first { $_->FleetID == $fleet_id } $self->Fleets;
+    croak("fleet $fleet_id doesnt exist") unless $fleet;
+    return $fleet;
 }
 
 sub Planets {
@@ -53,46 +49,22 @@ sub Planets {
 
 sub MyPlanets {
     my ($self) = @_;
-    my @planets;
-    foreach (@{$self->{_planets}}) {
-        if ($_->Owner() == 1) {
-            push(@planets,$_);
-        }
-    }
-    return @planets;
+    return grep { $_->Owner == 1 } $self->Planets;
 }
 
 sub NeutralPlanets {
     my ($self) = @_;
-    my @planets;
-    foreach (@{$self->{_planets}}) {
-        if ($_->Owner() == 0) {
-            push(@planets,$_);
-        }
-    }
-    return @planets;
+    return grep { $_->Owner == 0 } $self->Planets;
 }
 
 sub EnemyPlanets {
     my ($self) = @_;
-    my @planets;
-    foreach (@{$self->{_planets}}) {
-        if (($_->Owner() > 1) ) {
-            push(@planets,$_);
-        }
-    }
-    return @planets;
+    return grep { $_->Owner == 2 } $self->Planets;
 }
 
 sub NotMyPlanets {
     my ($self) = @_;
-    my @planets;
-    foreach (@{$self->{_planets}}) {
-        if ($_->Owner() != 1) {
-            push(@planets,$_);
-        }
-    }
-    return @planets;
+    return grep { $_->Owner != 1 } $self->Planets;
 }
 
 sub Fleets {
@@ -102,32 +74,26 @@ sub Fleets {
 
 sub MyFleets {
     my ($self) = @_;
-    my @fleets;
-    foreach (@{$self->{_fleets}}) {
-        if ($_->Owner() == 1) {
-            push(@fleets,$_);
-        }
-    }
-    return @fleets;
+    return grep { $_->Owner == 1 } $self->Fleets;
 }
 
 sub EnemyFleets {
     my ($self) = @_;
-    my @fleets;
-    foreach (@{$self->{_fleets}}) {
-        if (($_->Owner() > 1) ) {
-            push(@fleets,$_);
-        }
-    }
-    return @fleets;
+    return grep { $_->Owner == 2 } $self->Fleets;
 }
 
 sub Distance {
-    my ($self, $source_planet_id, $destination_planet_id) = @_;
-    my $source_planet = $self->GetPlanet($source_planet_id);
-    my $destination_planet = $self->GetPlanet($destination_planet_id);
-    my $dx = $source_planet->X() - $destination_planet->X();
-    my $dy = $source_planet->Y() - $destination_planet->Y();
+    my ($self, $source_planet, $destination_planet) = @_;
+
+    # If IDs passed, fetch the related object:
+    $source_planet = $self->GetPlanet($source_planet)
+        unless blessed $source_planet;
+
+    $destination_planet = $self->GetPlanet($destination_planet)
+        unless blessed $destination_planet;
+
+    my $dx = $source_planet->X - $destination_planet->X;
+    my $dy = $source_planet->Y - $destination_planet->Y;
     return abs(&POSIX::ceil(sqrt($dx * $dx + $dy * $dy)));
 }
 
@@ -138,17 +104,12 @@ sub IssueOrder {
 
 sub IsAlive {
     my ($self, $player_id) = @_;
-    foreach (@{$self->{_planets}}) {
-        if ($_->Owner() == $player_id) {
-            return 1;
-        }
+    if ($player_id == 1) {
+        return scalar($self->MyPlanets || $self->MyFleets);
     }
-    foreach (@{$self->{_fleets}}) {
-        if ($_->Owner() == $player_id) {
-            return 1;
-        }
+    elsif ($player_id == 2) {
+        return scalar($self->EnemyPlanets || $self->EnemyFleets);
     }
-    return 0;
 }
 
 sub ParseGameState {
