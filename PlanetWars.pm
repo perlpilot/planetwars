@@ -113,6 +113,10 @@ sub IsAlive {
     }
 }
 
+# Cache regex's between runs..
+my $planet_r = qr/^\s*P\s(\S+)\s(\S+)\s(\S+)\s(\S+)\s(\S+)/;
+my $fleet_r = qr/^\s*F\s(\S+)\s(\S+)\s(\S+)\s(\S+)\s(\S+)\s(\S+)/;
+
 sub ParseGameState {
     my ($self, $gameState) = @_;
     my $planet_id = 0;
@@ -121,13 +125,13 @@ sub ParseGameState {
     foreach (@$gameState) {
         next if /\s*#/; # Skip comments.
 
-        if ($_ =~ m/^\s*P\s(\S+)\s(\S+)\s(\S+)\s(\S+)\s(\S+)/) {;
+        if ($_ =~ $planet_r) {
             push(
                 @{$self->{_planets}},
                 new Planet($planet_id,$1,$2,$3,$4,$5)
             );
             $planet_id++;
-        } elsif ($_ =~ m/^\s*F\s(\S+)\s(\S+)\s(\S+)\s(\S+)\s(\S+)\s(\S+)/) {
+        } elsif ($_ =~ $fleet_r) {
             push(
                 @{$self->{_fleets}},
                 new Fleet($fleet_id,$1,$2,$3,$4,$5,$6)
