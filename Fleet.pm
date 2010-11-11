@@ -1,6 +1,7 @@
 package Fleet;
 use strict;
 use warnings;
+use overload '""' => sub { shift->FleetID };
 
 sub new {
     my $class = shift;

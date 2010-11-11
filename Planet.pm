@@ -1,6 +1,7 @@
 package Planet;
 use strict;
 use warnings;
+use overload '""' => sub { shift->PlanetID };
 
 sub new {
     my $class = shift;
