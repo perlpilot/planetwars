@@ -4,6 +4,7 @@ use strict;
 use POSIX;
 use Scalar::Util qw(blessed);
 use List::Util qw(first);
+use Carp qw(croak);
 use Planet;
 use Fleet;
 
