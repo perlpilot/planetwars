@@ -27,7 +27,7 @@ sub NumPlanets {
 sub GetPlanet {
     my ($self, $planet_id) = @_;
     my $planet = first { $_->PlanetID == $planet_id } $self->Planets;
-    croak("planet $planet_id doesnt exist") unless $planet;
+    croak("planet $planet_id doesn't exist") unless defined $planet;
     return $planet;
 }
 
@@ -39,7 +39,7 @@ sub NumFleets {
 sub GetFleet {
     my ($self, $fleet_id) = @_;
     my $fleet = first { $_->FleetID == $fleet_id } $self->Fleets;
-    croak("fleet $fleet_id doesnt exist") unless $fleet;
+    croak("fleet $fleet_id doesn't exist") unless defined $fleet;
     return $fleet;
 }
 
