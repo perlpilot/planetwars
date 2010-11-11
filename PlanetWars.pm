@@ -3,7 +3,6 @@ use warnings;
 use strict;
 use POSIX;
 use Scalar::Util qw(blessed);
-use List::Util qw(first);
 use Carp qw(croak);
 use Planet;
 use Fleet;
@@ -26,7 +25,7 @@ sub NumPlanets {
 
 sub GetPlanet {
     my ($self, $planet_id) = @_;
-    my $planet = first { $_->PlanetID == $planet_id } $self->Planets;
+    my $planet = $self->{_planets}->[$planet_id];
     croak("planet $planet_id doesn't exist") unless defined $planet;
     return $planet;
 }
@@ -38,7 +37,7 @@ sub NumFleets {
 
 sub GetFleet {
     my ($self, $fleet_id) = @_;
-    my $fleet = first { $_->FleetID == $fleet_id } $self->Fleets;
+    my $fleet = $self->{_fleets}->[$fleet_id];
     croak("fleet $fleet_id doesn't exist") unless defined $fleet;
     return $fleet;
 }
@@ -126,16 +125,12 @@ sub ParseGameState {
         next if /\s*#/; # Skip comments.
 
         if ($_ =~ $planet_r) {
-            push(
-                @{$self->{_planets}},
-                new Planet($planet_id,$1,$2,$3,$4,$5)
-            );
+            $self->{_planets}->[$planet_id]
+                = new Planet($planet_id,$1,$2,$3,$4,$5);
             $planet_id++;
         } elsif ($_ =~ $fleet_r) {
-            push(
-                @{$self->{_fleets}},
-                new Fleet($fleet_id,$1,$2,$3,$4,$5,$6)
-            );
+            $self->{_fleets}->[$fleet_id]
+                = new Fleet($fleet_id,$1,$2,$3,$4,$5,$6);
             $fleet_id++;
         } else {
             die('invalid parseinput')
