@@ -1,12 +1,11 @@
 #!/usr/bin/perl
 
-use feature ':5.10';
 use warnings;
 use strict;
 use PlanetWars;
 use Test::More tests => 31;
 
-say "Testing Fleet-object";
+print "Testing Fleet-object\n";
 my $fleet = new Fleet(0, 1, 2, 3, 4, 5, 6);
 
 is($fleet->FleetID(),0,'FleetID');
@@ -17,7 +16,7 @@ is($fleet->DestinationPlanet(),4,'DestinationPlanet');
 is($fleet->TotalTripLength(),5,'TotalTripLength');
 is($fleet->TurnsRemaining(),6,'TurnsRemaining');
 
-say "Testing Planet-object";
+print "Testing Planet-object\n";
 my $planet = new Planet(0, 1, 2, 1, 4, 5);
 
 is($planet->PlanetID(),0,'PlanetID');
@@ -35,7 +34,7 @@ is($planet->NumShips(),11,'AddShips');
 $planet->RemoveShips(8);
 is($planet->NumShips(),3,'RemoveShips');
 
-say "Testing PlanetWars-object";
+print "Testing PlanetWars-object\n";
 my $PlanetWars = new PlanetWars(["P 0 0 1 34 2","P 7 9 2 34 2","P 3.14 2.71 0 15 5","F 1 15 0 1 12 2","F 2 28 1 2 8 4"]);
 
 is($PlanetWars->NumPlanets(),3,'NumPlanets');
