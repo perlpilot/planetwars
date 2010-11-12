@@ -15,7 +15,7 @@ while(1) {
         last;
     }
     elsif ($current_line =~ m/go/) {
-        my $pw = new PlanetWars($map_data);
+        my $pw = PlanetWars->new($map_data);
         DoTurn($pw);
         $pw->FinishTurn();
         $map_data = [];

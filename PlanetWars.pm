@@ -127,11 +127,11 @@ sub ParseGameState {
 
         if ($_ =~ $planet_r) {
             $self->{_planets}->[$planet_id]
-                = new Planet($planet_id,$1,$2,$3,$4,$5);
+                = Planet->new($planet_id,$1,$2,$3,$4,$5);
             $planet_id++;
         } elsif ($_ =~ $fleet_r) {
             $self->{_fleets}->[$fleet_id]
-                = new Fleet($fleet_id,$1,$2,$3,$4,$5,$6);
+                = Fleet->new($fleet_id,$1,$2,$3,$4,$5,$6);
             $fleet_id++;
         } else {
             die('invalid parseinput')
