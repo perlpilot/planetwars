@@ -110,6 +110,7 @@ sub IsAlive {
     elsif ($player_id == 2) {
         return scalar($self->EnemyPlanets || $self->EnemyFleets);
     }
+    return 0;
 }
 
 # Cache regex's between runs..
