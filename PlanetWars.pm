@@ -114,16 +114,17 @@ sub IsAlive {
 }
 
 # Cache regex's between runs..
-my $planet_r = qr/^\s*P\s(\S+)\s(\S+)\s(\S+)\s(\S+)\s(\S+)/;
-my $fleet_r = qr/^\s*F\s(\S+)\s(\S+)\s(\S+)\s(\S+)\s(\S+)\s(\S+)/;
+my $planet_r = qr/^\s*P\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)/;
+my $fleet_r = qr/^\s*F\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)/;
 
 sub ParseGameState {
     my ($self, $gameState) = @_;
     my $planet_id = 0;
     my $fleet_id = 0;
 
-    foreach (@$gameState) {
-        next if /\s*#/; # Skip comments.
+    for (@$gameState) {
+        s/#.*$//;           # Remove comments
+        next if /^\s*$/;    # Skip blank lines
 
         if ($_ =~ $planet_r) {
             $self->{_planets}->[$planet_id]
